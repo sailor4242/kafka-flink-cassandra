@@ -1,5 +1,13 @@
 Pet project to experiment with kafka, flink & cassandra
 
+ start up optional steps ( for latest windows OS) in case you install all the environment inside 
+ your OS ( in case you use Docker containers skill the steps below ) : 
+ - `cd C:\zookeeper-3.4.12`
+ - `zkServer.cmd`
+ - `cd C:\kafka_2.12-2.1.0`
+ - `.\bin\windows\kafka-server-start.bat .\config\server.properties`
+ - `cassandra -f`
+
 ### Websocket server
 
 To be in control over the incomning data I've setup a websocket server that reads from a huge CSV file and post each line in regular intervals to it's clients
@@ -37,9 +45,23 @@ When websocket server & kafka are running we can run the websocket client / kafk
 
 ### Kafka Consumer -> Flink -> Cassandra
 
-Have a kafka consumer to Flink read from the kafka stream and 
-*process the data
-*store the results in cassandra
+Have a kafka consumer to Flink read from the kafka stream for :  
+- process the data
+- store the results in cassandra
+
+### Cassandra 
+
+ cassandra prep STEPS:
+ 
+ `docker exec -it cassandra cqlsh -e "CREATE KEYSPACE IF NOT EXISTS test_keyspace WITH 
+ REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 1 };"`
+ 
+ `docker exec -it cassandra cqlsh -e "CREATE TABLE IF NOT EXISTS test_keyspace.table_ticker (id uuid, ticker text, time text,
+ price text, volume int, currency text, PRIMARY KEY (id));"`
+
+ `docker exec -it cassandra cqlsh -e "CREATE TABLE IF NOT EXISTS test_keyspace.table_ohlc1m (id uuid, ticker text timeStart text, open text, high text, low text, close text, volume int, currency text, PRIMARY KEY(id));"`
+ 
+ `docker exec -it cassandra cqlsh -e "DROP TABLE test_keyspace.table_ticker;"`
 
 
 
