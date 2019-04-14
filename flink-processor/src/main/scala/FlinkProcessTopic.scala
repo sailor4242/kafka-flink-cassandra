@@ -48,7 +48,7 @@ object FlinkProcessTopic extends App {
                                    volume: Int,
                                    currency: String
                                   ){
-    override def toString: _root_.java.lang.String = s"$ticker $time $price $volume $currency"
+    override def toString: String = s"$ticker $time $price $volume $currency"
   }
   val tickerStream: DataStream[Ticker] = stream.map { str =>
     val tick = decode[Ticker](str).right.get
