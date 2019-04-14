@@ -1,5 +1,6 @@
 import java.util.UUID
 
+
 import org.apache.flink.streaming.api.scala.function._
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
@@ -27,14 +28,4 @@ object FlinkWindowProcessFunc extends ProcessAllWindowFunction[Ticker, OHLC1Min,
 
   }
 }
-case class OHLC1Min(id:UUID,
-                    ticker : String,
-                    tStart: String,
-                    open: String,
-                    high: String,
-                    low: String,
-                    close: String,
-                    vol: Int,
-                    currency: String ){
-  override def toString: String = s"OHLC1m[$ticker , $tStart, $open, $high $low $close $vol]"
-}
+

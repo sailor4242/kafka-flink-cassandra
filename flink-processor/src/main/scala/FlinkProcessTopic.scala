@@ -3,6 +3,7 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{Properties, UUID}
 
+
 import com.typesafe.scalalogging.Logger
 import io.circe.parser.decode
 import org.apache.flink.api.common.serialization.SimpleStringSchema
@@ -25,8 +26,7 @@ object FlinkProcessTopic extends App {
   val streamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
   streamExecutionEnvironment.setParallelism(1)
   implicit lazy val config: FlinkConfig = loadConfigOrThrow[FlinkConfig]
-  implicit val logger = Logger(className)
-
+  implicit val logger: Logger = Logger(className)
 
   // Set Flink properties
   val properties = new Properties()
@@ -40,16 +40,6 @@ object FlinkProcessTopic extends App {
         properties)
         .setStartFromEarliest()
     )
-
-  final case class TickerCassandra(id: UUID,
-                                   ticker: String,
-                                   time: String,
-                                   price: String,
-                                   volume: Int,
-                                   currency: String
-                                  ){
-    override def toString: String = s"$ticker $time $price $volume $currency"
-  }
   val tickerStream: DataStream[Ticker] = stream.map { str =>
     val tick = decode[Ticker](str).right.get
     tick
@@ -62,6 +52,7 @@ object FlinkProcessTopic extends App {
       }
     })
   tickerStream.print()
+
   val cassandraTickersStream = tickerStream.map{ tick =>
     TickerCassandra(
       UUID.randomUUID(),
@@ -72,37 +63,25 @@ object FlinkProcessTopic extends App {
       tick.last.currency.toString
     )
   }
+
   val bar1MinStream: DataStream[OHLC1Min] = tickerStream
     .timeWindowAll(Time.minutes(1)).process(FlinkWindowProcessFunc)
   bar1MinStream.print()
 
    CassandraSink.addSink(bar1MinStream)
-     .setHost("localhost", 9042)
+     .setHost(config.cassandraConfig.host, config.cassandraConfig.port)
      .setQuery("INSERT INTO " +
        "test_keyspace.table_ohlc1m(id, ticker, timeStart, open, high, low, close , volume, " +
        "currency) " +
        "values (?, ?, ?, ?, ?, ?, ?, ?, ? );").build()
 
    CassandraSink.addSink(cassandraTickersStream)
-   .setHost("localhost", 9042)
+   .setHost(config.cassandraConfig.host, config.cassandraConfig.port)
    .setQuery("INSERT INTO test_keyspace" +
      ".table_ticker(id, ticker, time, price, volume, currency )" +
      "values (?, ?, ?, ?, ?, ?);").build()
 
+
   streamExecutionEnvironment.execute(config.jobName)
 }
 
-// start up optional steps ( win )  :
-// cd C:\zookeeper-3.4.12
-// zkServer.cmd
-// cd C:\kafka_2.12-2.1.0
-// .\bin\windows\kafka-server-start.bat .\config\server.properties
-// cassandra -f
-
-// cassandra prep STEPS:
-// docker exec -it cassandra cqlsh -e "CREATE KEYSPACE IF NOT EXISTS test_keyspace WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 1 };"
-// docker exec -it cassandra cqlsh -e "CREATE TABLE IF NOT EXISTS test_keyspace.table_ticker (id uuid, ticker text, time text,
-// price text, volume int, currency text, PRIMARY KEY (id));"
-
-// docker exec -it cassandra cqlsh -e "CREATE TABLE IF NOT EXISTS test_keyspace.table_ohlc1m (id uuid, ticker text timeStart text, open text, high text, low text, close text, volume int, currency text, PRIMARY KEY(id));"
-// docker exec -ot cassandra cqlsh -e "DROP TABLE test_keyspace.table_ticker;"
