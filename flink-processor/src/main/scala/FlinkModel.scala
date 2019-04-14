@@ -11,6 +11,8 @@ import java.util.UUID
                       currency: String ){
     override def toString: String = s"OHLC1m[$ticker , $tStart, $open, $high $low $close $vol]"
   }
+
+
   final case class TickerCassandra(id: UUID,
                                    ticker: String,
                                    time: String,
