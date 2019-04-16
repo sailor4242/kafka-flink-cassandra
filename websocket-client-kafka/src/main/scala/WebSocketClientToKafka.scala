@@ -13,6 +13,7 @@ import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSeriali
 import pureconfig.loadConfigOrThrow
 import pureconfig.generic.auto._
 import io.circe.parser.decode
+import model.Ticker
 
 import scala.concurrent.Promise
 import scala.concurrent.duration._

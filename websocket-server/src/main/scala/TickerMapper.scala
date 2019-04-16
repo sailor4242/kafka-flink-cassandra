@@ -1,4 +1,5 @@
 import akka.util.ByteString
+import model._
 
 trait TickerMapper {
   def map(line: ByteString): Ticker
@@ -14,7 +15,7 @@ class IveTickerMapper extends TickerMapper {
     Ticker(
       TickerType.withName(str(0)),
       outputDateTimeFormat.format(inputDateTimeFormat.parse(str(1) + str(2))),
-      Last(BigDecimal(str(3)), Currency.RUB),
+      CurrencyValue(BigDecimal(str(3)), Currency.RUB),
       str(4).toInt
     )
   }

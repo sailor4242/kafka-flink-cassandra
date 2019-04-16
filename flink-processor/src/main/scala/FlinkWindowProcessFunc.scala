@@ -1,6 +1,6 @@
 import java.util.UUID
 
-
+import model.Ticker
 import org.apache.flink.streaming.api.scala.function._
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
