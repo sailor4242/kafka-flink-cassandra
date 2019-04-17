@@ -17,6 +17,10 @@ import org.apache.flink.streaming.connectors.cassandra.CassandraSink
 import pureconfig.generic.auto._
 
 
+import io.circe.parser.decode
+import model.Ticker
+//import org.apache.flink.streaming.connectors.cassandra.CassandraSink
+
 /**
   * Reads from kafka topic and processes it using flink in windows
   */
