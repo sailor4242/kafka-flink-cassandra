@@ -29,7 +29,7 @@ object UserRestServer extends App {
       blockingEC   <- ZIO.environment[Blocking].flatMap(_.blocking.blockingExecutor).map(_.asEC)
       transactorR   = mkTransactor(cfg.dbConfig, Platform.executor.asEC, blockingEC)
 
-      server        = http.bindAndHandle(cfg.appConfig.port)
+      server        = http.bindAndHandle(cfg.appConfig.port).flatMap(_ => ZIO.never)
       program      <- transactorR.use { tr =>
         server.provideSome[Environment] { base =>
           new Clock with Console with Blocking with UserService.Live with Http.Live with Repository.Live {

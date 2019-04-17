@@ -46,6 +46,7 @@ package model {
   @JsonCodec
   final case class CreateUser(firstName: String, lastName: String) {
     def asUser: User = User(UUID.randomUUID(), firstName, lastName)
+    def asUser(uid: String): User = User(UUID.fromString(uid), firstName, lastName)
   }
 
   @JsonCodec

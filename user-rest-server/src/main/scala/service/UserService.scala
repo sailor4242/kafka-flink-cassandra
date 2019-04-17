@@ -39,10 +39,10 @@ object UserService {
 
       override def getById(uid: UUID): ZIO[Any, Throwable, UserAccount] = (for {
         op <- repository getUserByUId uid
-        p <- ZIO.fromOption(op)
-        stocks <- repository getAllStocksByUserId p._1
-        funds <- repository getAllFundsByUserId p._1
-      } yield UserAccount(p._2, stocks, funds)).orDieWith(ex => new NullPointerException("as"))
+        u <- ZIO.fromOption(op)
+//        stocks <- repository getAllStocksByUserId id
+//        funds <- repository getAllFundsByUserId id
+      } yield UserAccount(u._2)).orDieWith(ex => new NullPointerException("as"))
 
       override def buyStock(uid: UUID, stock: StockOp): ZIO[Any, Throwable, UserAccount] = ???
 

@@ -1,4 +1,4 @@
-import sbt.{addCompilerPlugin, compilerPlugin, _}
+import sbt.{addCompilerPlugin}
 import sbt.Keys._
 
 name := "kafka-flink-cassandra"

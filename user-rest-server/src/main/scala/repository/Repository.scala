@@ -9,7 +9,6 @@ import scalaz.zio.interop.catz._
 import scalaz.zio._
 import cats.implicits._
 import doobie.free.connection
-import scalaz.Monoid
 import doobie.h2.implicits._
 
 trait Repository {
