@@ -3,6 +3,7 @@ package service
 import java.util.UUID
 
 import com.typesafe.scalalogging.StrictLogging
+import exceptions.UserNotFound
 import repository.Repository
 import scalaz.zio.ZIO
 import model._
@@ -38,11 +39,11 @@ object UserService {
       } yield UserAccount(u)
 
       override def getById(uid: UUID): ZIO[Any, Throwable, UserAccount] = (for {
-        op <- repository getUserByUId uid
-        u <- ZIO.fromOption(op)
-//        stocks <- repository getAllStocksByUserId id
-//        funds <- repository getAllFundsByUserId id
-      } yield UserAccount(u._2)).orDieWith(ex => new NullPointerException("as"))
+        idUserOp <- repository getUserByUId uid
+        idUserPair <- ZIO.fromOption(idUserOp)
+        stocks <- repository getAllStocksByUserId idUserPair._1
+        funds <- repository getAllFundsByUserId idUserPair._1
+      } yield UserAccount(idUserPair._2, stocks, funds)).orDieWith(_ => UserNotFound(uid))
 
       override def buyStock(uid: UUID, stock: StockOp): ZIO[Any, Throwable, UserAccount] = ???
 

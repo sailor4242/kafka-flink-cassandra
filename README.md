@@ -34,14 +34,17 @@ When websocket server & kafka are running we can run the websocket client / kafk
 
 `sbt "project websocket-client-kafka" "run"`
 
-### Cassandra
+### User Rest Server
 
-`docker run --name cassandra  -d -p 9042:9042 cassandra
-`
-### Portainer
+Create user account:
 
-`docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer
-`
+`POST localhost:8081/account`
+`Body: {"firstName": "Joe", lastName: "Johnes""}`
+
+Get user account:
+
+`GET localhost:8081/account/{uid}`
+
 
 ### Kafka Consumer -> Flink -> Cassandra
 
@@ -51,6 +54,8 @@ Have a kafka consumer to Flink read from the kafka stream for :
 
 ### Cassandra 
 
+`docker run --name cassandra  -d -p 9042:9042 cassandra
+`
  cassandra prep STEPS:
  
  `docker exec -it cassandra cqlsh -e "CREATE KEYSPACE IF NOT EXISTS test_keyspace WITH 
@@ -62,6 +67,12 @@ Have a kafka consumer to Flink read from the kafka stream for :
  `docker exec -it cassandra cqlsh -e "CREATE TABLE IF NOT EXISTS test_keyspace.table_ohlc1m (id uuid, ticker text timeStart text, open text, high text, low text, close text, volume int, currency text, PRIMARY KEY(id));"`
  
  `docker exec -it cassandra cqlsh -e "DROP TABLE test_keyspace.table_ticker;"`
+ 
+ ### Portainer
+ Portainer is a useful WebUI to manage your docker containers.
+ 
+ `docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer
+ `
 
 
 
