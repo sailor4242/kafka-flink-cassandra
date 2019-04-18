@@ -4,6 +4,6 @@ package exceptions {
 
   abstract class StacklessException(message: String) extends Exception(message, null, false, false)
 
-  final case class UserNotFound(uid: UUID)     extends StacklessException(s"User $uid not found")
+  final case class UserNotFound(uid: UUID) extends StacklessException(s"User $uid not found")
 
 }

@@ -7,7 +7,8 @@ import scalaz.zio._
 package object http extends Http.Service[Http] {
 
   def bindAndHandle(port: Int)(
-    implicit system: ActorSystem,
+    implicit
+    system: ActorSystem,
     mat: Materializer): ZIO[Http, Throwable, ServerBinding] =
     ZIO.accessM(_.http bindAndHandle port)
 

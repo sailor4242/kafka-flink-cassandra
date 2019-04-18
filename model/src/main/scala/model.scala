@@ -8,14 +8,16 @@ import scala.collection.immutable
 package model {
 
   @JsonCodec
-  final case class Ticker(tickerType: TickerType,
-                          time: String,
-                          last: CurrencyValue,
-                          volume: Int)
+  final case class Ticker(
+    tickerType: TickerType,
+    time: String,
+    last: CurrencyValue,
+    volume: Int)
 
   @JsonCodec
-  final case class CurrencyValue(value: BigDecimal,
-                                 currency: Currency)
+  final case class CurrencyValue(
+    value: BigDecimal,
+    currency: Currency)
 
   sealed trait TickerType extends EnumEntry
 
@@ -46,24 +48,28 @@ package model {
   }
 
   @JsonCodec
-  final case class User(uid: UUID,
-                        firstName: String,
-                        lastName: String)
+  final case class User(
+    uid: UUID,
+    firstName: String,
+    lastName: String)
 
   @JsonCodec
-  final case class UserAccount(user: User,
-                               stocks: List[Stock] = List(),
-                               funds: List[CurrencyValue] = List(),
-                               revenue: CurrencyValue = CurrencyValue(0, Currency.USD))
+  final case class UserAccount(
+    user: User,
+    stocks: List[Stock] = List(),
+    funds: List[CurrencyValue] = List(),
+    revenue: CurrencyValue = CurrencyValue(0, Currency.USD))
 
   @JsonCodec
-  final case class Stock(tickerType: TickerType,
-                         time: String,
-                         price: CurrencyValue,
-                         volume: Int)
+  final case class Stock(
+    tickerType: TickerType,
+    time: String,
+    price: CurrencyValue,
+    volume: Int)
 
   @JsonCodec
-  final case class StockOp(tickerType: TickerType,
-                           volume: Int)
+  final case class StockOp(
+    tickerType: TickerType,
+    volume: Int)
 
 }

@@ -1,6 +1,6 @@
 import java.util.UUID
 
-import akka.http.scaladsl.server.{Directives, Route}
+import akka.http.scaladsl.server.{ Directives, Route }
 import scalaz.Monoid
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport.marshaller
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport.unmarshaller
@@ -25,16 +25,15 @@ object Routes {
 
 case class Routes(userService: UserService.Service[Any]) {
 
-  implicit def zioMarshaller[A, B](implicit futureMarshaller: Marshaller[Future[A], B])
-                                  : Marshaller[ZIO[UserService.Service[Any], Throwable, A], B] =
+  implicit def zioMarshaller[A, B](implicit futureMarshaller: Marshaller[Future[A], B]): Marshaller[ZIO[UserService.Service[Any], Throwable, A], B] =
     futureMarshaller.compose(io ⇒ unsafeRunToFuture(io.provide(userService)))
 
   def routes: Route = {
     pathPrefix("account") {
       createUser ~
-      pathPrefix(JavaUUID) { uid: UUID ⇒
-        getUser(uid) ~ buyStock(uid) ~ sellStock(uid) ~ addFund(uid)
-      }
+        pathPrefix(JavaUUID) { uid: UUID ⇒
+          getUser(uid) ~ buyStock(uid) ~ sellStock(uid) ~ addFund(uid)
+        }
     }
   }
 

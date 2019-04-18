@@ -1,62 +1,43 @@
-Pet project to experiment with kafka, flink & cassandra
+_Under construction_
 
- start up optional steps ( for latest windows OS) in case you install all the environment inside 
- your OS ( in case you use Docker containers skill the steps below ) : 
- - `cd C:\zookeeper-3.4.12`
- - `zkServer.cmd`
- - `cd C:\kafka_2.12-2.1.0`
- - `.\bin\windows\kafka-server-start.bat .\config\server.properties`
- - `cassandra -f`
+Pet project to experiment with kafka, flink, cassandra with scala and it's ecosystem.
 
-### Websocket server
+Project itself represents a market data flow from websocket client to kafka and cassandra with some underlying transformations.
 
-To be in control over the incomning data I've setup a websocket server that reads from a huge CSV file and post each line in regular intervals to it's clients
+To set up the environment (kafka, cassandra) just simply run:
+- `sbt docker:stage`
+- `docker-compose up` 
 
-Run:
+from the projects root. Make sure all necessary ports are available
 
-`sbt "project websocket-server" "run"`
+#### Websocket server
 
-### Kafka 
+To be in control over the incomning data I've setup a websocket server that reads from huge CSV files and posts each line to it's clients
 
-Start Kafka on Docker with zookeeper
+##### Websocket client -> Kafka Producer
 
-`docker run -d -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=127.0.0.1 --env ADVERTISED_PORT=9092 --name kafka johnnypark/kafka-zookeeper`
+Client to split data by tickers and push them to kafka topics
 
-`ADVERTISTED_HOST` was set to `127.0.0.1`, which will allow other containers to be able to run Producers and Consumers.
+##### Kafka Consumer -> Flink -> Cassandra
 
-Setting `ADVERTISED_HOST` to `localhost`, `127.0.0.1`, or `0.0.0.0` will work great only if Producers and Consumers are started within the `kafka` container itself, or if you are using DockerForMac (like me) and you want to run Producers and Consumers from OSX.
+A consumer for Flink to read and transform ticks into bars and then save them to cassandra
 
+##### User Rest Server
 
-### Websocket client -> Kafka Producer
+REST server to interact with users
 
-When websocket server & kafka are running we can run the websocket client / kafka producer
-
-
-`sbt "project websocket-client-kafka" "run"`
-
-### User Rest Server
+Query examples :
 
 Create user account:
-
 `POST localhost:8081/account`
 `Body: {"firstName": "Joe", lastName: "Johnes""}`
 
 Get user account:
-
 `GET localhost:8081/account/{uid}`
-
-
-### Kafka Consumer -> Flink -> Cassandra
-
-Have a kafka consumer to Flink read from the kafka stream for :  
-- process the data
-- store the results in cassandra
 
 ### Cassandra 
 
-`docker run --name cassandra  -d -p 9042:9042 cassandra
-`
- cassandra prep STEPS:
+ Schema preparation queries:
  
  `docker exec -it cassandra cqlsh -e "CREATE KEYSPACE IF NOT EXISTS test_keyspace WITH 
  REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 1 };"`

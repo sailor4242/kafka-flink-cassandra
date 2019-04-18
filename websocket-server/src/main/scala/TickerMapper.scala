@@ -16,7 +16,6 @@ class IveTickerMapper extends TickerMapper {
       TickerType.withName(str(0)),
       outputDateTimeFormat.format(inputDateTimeFormat.parse(str(1) + str(2))),
       CurrencyValue(BigDecimal(str(3)), Currency.RUB),
-      str(4).toInt
-    )
+      str(4).toInt)
   }
 }

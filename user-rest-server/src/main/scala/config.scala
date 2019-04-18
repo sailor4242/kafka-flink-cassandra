@@ -10,20 +10,17 @@ object config {
 
   final case class Config(
     appConfig: AppConfig,
-    dbConfig: DBConfig
-  )
+    dbConfig: DBConfig)
 
   final case class AppConfig(
     port: Int,
-    baseUrl: String
-  )
+    baseUrl: String)
 
   final case class DBConfig(
     url: String,
     driver: String,
     user: String,
-    password: String
-  )
+    password: String)
 
   def initDb(cfg: DBConfig): Task[Unit] =
     ZIO.effect {
@@ -37,8 +34,7 @@ object config {
   def mkTransactor(
     cfg: DBConfig,
     connectEC: ExecutionContext,
-    transactEC: ExecutionContext
-  ): Managed[Throwable, Transactor[Task]] = {
+    transactEC: ExecutionContext): Managed[Throwable, Transactor[Task]] = {
     val xa = HikariTransactor.newHikariTransactor[Task](
       cfg.driver,
       cfg.url,
@@ -49,12 +45,12 @@ object config {
 
     val res = xa
       .allocated
-      .map { case (transactor, cleanupM) =>
-        ZManaged.Reservation(ZIO.succeed(transactor), cleanupM.orDie)
+      .map {
+        case (transactor, cleanupM) =>
+          ZManaged.Reservation(ZIO.succeed(transactor), cleanupM.orDie)
       }.uninterruptible
 
     Managed(res)
   }
-
 
 }
