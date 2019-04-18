@@ -34,20 +34,6 @@ Create user account:
 
 Get user account:
 `GET localhost:8081/account/{uid}`
-
-### Cassandra 
-
- Schema preparation queries:
- 
- `docker exec -it cassandra cqlsh -e "CREATE KEYSPACE IF NOT EXISTS test_keyspace WITH 
- REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 1 };"`
- 
- `docker exec -it cassandra cqlsh -e "CREATE TABLE IF NOT EXISTS test_keyspace.table_ticker (id uuid, ticker text, time text,
- price text, volume int, currency text, PRIMARY KEY (id));"`
-
- `docker exec -it cassandra cqlsh -e "CREATE TABLE IF NOT EXISTS test_keyspace.table_ohlc1m (id uuid, ticker text timeStart text, open text, high text, low text, close text, volume int, currency text, PRIMARY KEY(id));"`
- 
- `docker exec -it cassandra cqlsh -e "DROP TABLE test_keyspace.table_ticker;"`
  
  ### Portainer
  Portainer is a useful WebUI to manage your docker containers.
