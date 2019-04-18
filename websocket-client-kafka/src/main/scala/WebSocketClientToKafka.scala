@@ -2,14 +2,14 @@ import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.ws.TextMessage.Strict
-import akka.http.scaladsl.model.ws.{Message, WebSocketRequest}
+import akka.http.scaladsl.model.ws.{ Message, WebSocketRequest }
 import akka.kafka.ProducerSettings
 import akka.kafka.scaladsl.Producer
-import akka.stream.{ActorMaterializer, OverflowStrategy}
-import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
+import akka.stream.{ ActorMaterializer, OverflowStrategy }
+import akka.stream.scaladsl.{ Flow, Keep, Sink, Source }
 import com.typesafe.scalalogging.Logger
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
+import org.apache.kafka.common.serialization.{ ByteArraySerializer, StringSerializer }
 import pureconfig.loadConfigOrThrow
 import pureconfig.generic.auto._
 import io.circe.parser.decode
@@ -19,9 +19,9 @@ import scala.concurrent.Promise
 import scala.concurrent.duration._
 
 /**
-  * Websocket client that connects to the Websocket server and passes all messages to a kafka topic
-  * with a backpressure buffer strategy
-  */
+ * Websocket client that connects to the Websocket server and passes all messages to a kafka topic
+ * with a backpressure buffer strategy
+ */
 object WebSocketClientToKafka extends App {
 
   // Some general config to get the actor system up and running
@@ -50,7 +50,7 @@ object WebSocketClientToKafka extends App {
     }
     .filter(_.isDefined)
     .map(message =>
-        new ProducerRecord[Array[Byte], String](decode[Ticker](message.get).right.get.tickerType.entryName, message.get))
+      new ProducerRecord[Array[Byte], String](decode[Ticker](message.get).right.get.tickerType.entryName, message.get))
     .to(Producer.plainSink(producerSettings))
 
   // Materialize the sink as a flow

@@ -1,17 +1,13 @@
-import sbt.{addCompilerPlugin}
+import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerBaseImage
+import sbt.addCompilerPlugin
 import sbt.Keys._
 
 name := "kafka-flink-cassandra"
 
-version := "0.1"
+version := "0.0.1-SANPSHOT"
 
 lazy val root = (
   project.in(file("."))
-    .settings(
-      baseSettings,
-      addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9"),
-      addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.2.4"),
-    )
     aggregate(websocketServer, websocketClientKafka, flinkProcessor, userRestServer)
   )
 
@@ -31,38 +27,68 @@ lazy val flinkVersion = "1.7.2"
 lazy val websocketServer = (project in file("websocket-server"))
   .dependsOn(model)
   .settings(
+    baseSettings,
+    compilerPlugins,
     libraryDependencies ++= Seq(
       "io.chrisdavenport" %% "log4cats-core" % log4CatsVersion,
       "io.chrisdavenport" %% "log4cats-slf4j" % log4CatsVersion,
       "io.chrisdavenport" %% "cats-par" % "0.2.0",
       "io.monix" %% "monix" % "3.0.0-RC2"
     ) ++ commonDependencies ++ akka,
-    mainClass in Compile := Some("App")
+    mainClass in Compile := Some("App"),
+    packageName in Docker := "websocket-server",
+    dockerBaseImage := "anapsix/alpine-java",
+    dockerUpdateLatest := true
   )
+  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(DockerPlugin)
 
 lazy val websocketClientKafka = (project in file("websocket-client-kafka"))
   .dependsOn(model)
   .settings(
+    baseSettings,
+    compilerPlugins,
     libraryDependencies ++= commonDependencies ++ akka,
-    mainClass in Compile := Some("WebSocketClientToKafka")
+    mainClass in Compile := Some("WebSocketClientToKafka"),
+    packageName in Docker := "websocket-client",
+    dockerBaseImage := "anapsix/alpine-java",
+    dockerUpdateLatest := true
   )
+  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(DockerPlugin)
 
 lazy val flinkProcessor = (project in file("flink-processor"))
   .dependsOn(model)
   .settings(
+    baseSettings,
+    compilerPlugins,
     libraryDependencies ++= commonDependencies ++ flink,
-    mainClass in Compile := Some("FlinkProcessTopic")
+    mainClass in Compile := Some("FlinkProcessTopic"),
+    packageName in Docker := "flink-processor",
+    dockerBaseImage := "anapsix/alpine-java",
+    dockerUpdateLatest := true
   )
+  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(DockerPlugin)
 
 lazy val userRestServer = (project in file("user-rest-server"))
   .dependsOn(model)
   .settings(
+    baseSettings,
+    compilerPlugins,
     libraryDependencies ++= commonDependencies ++ akka ++ doobie ++ scalaz,
-    mainClass in Compile := Some("UserRestServer")
+    mainClass in Compile := Some("UserRestServer"),
+    packageName in Docker := "user-rest-server",
+    dockerBaseImage := "anapsix/alpine-java",
+    dockerExposedPorts ++= Seq(8081),
+    dockerUpdateLatest := true
   )
+  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(DockerPlugin)
 
 lazy val model = (project in file("model"))
   .settings(
+    baseSettings,
     libraryDependencies ++= circe,
     libraryDependencies ++= Seq(
       "com.beachape" %% "enumeratum" % enumeratumVersion,
@@ -129,6 +155,11 @@ lazy val baseSettings = Seq(
   sources in(Compile, doc) := Nil,
   publishTo := None,
   cancelable in Global := true
+)
+
+lazy val compilerPlugins = Seq(
+  addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9"),
+  addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.2.4")
 )
 
 lazy val commonScalacOptions = Seq(

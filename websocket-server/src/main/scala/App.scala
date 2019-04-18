@@ -1,7 +1,7 @@
 import cats.effect._
 import cats.implicits._
 import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
-import monix.eval.{Task, TaskApp}
+import monix.eval.{ Task, TaskApp }
 
 object App extends TaskApp {
 

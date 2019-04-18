@@ -21,8 +21,8 @@ package object repository extends Repository.Service[Repository] {
     ZIO.accessM(_.repository updateUser user)
 
   override def updateStockById(id: FiberId, stock: Stock): ZIO[Repository, Throwable, Unit] =
-    ZIO.accessM(_.repository updateStockById(id, stock))
+    ZIO.accessM(_.repository updateStockById (id, stock))
 
   override def updateFundById(id: FiberId, fund: CurrencyValue): ZIO[Repository, Throwable, Unit] =
-    ZIO.accessM(_.repository updateFundById(id, fund))
+    ZIO.accessM(_.repository updateFundById (id, fund))
 }

@@ -7,8 +7,8 @@ import akka.http.scaladsl.model.ws.TextMessage
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.settings.ServerSettings
 import akka.io.Inet
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
-import akka.stream.scaladsl.{FileIO, Framing, Sink}
+import akka.stream.{ ActorMaterializer, ActorMaterializerSettings }
+import akka.stream.scaladsl.{ FileIO, Framing, Sink }
 import akka.util.ByteString
 import cats.effect._
 import cats.implicits._
@@ -16,18 +16,17 @@ import syntax._
 import cats.temp.par.Par
 import pureconfig.loadConfigOrThrow
 import scala.concurrent.duration._
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 import io.circe.generic.auto._
 import io.circe.syntax._
 import pureconfig.generic.auto._
 import io.chrisdavenport.log4cats.Logger
 
 /**
-  * Websocket server that reads csv file of stock ticks
-  * and sends it via exposed port with some configurable delay
-  */
-class WebSocketServerApp[F[_] : Timer : ContextShift : Par : LiftIO](logger: Logger[F])
-                                                                    (implicit F: ConcurrentEffect[F]) {
+ * Websocket server that reads csv file of stock ticks
+ * and sends it via exposed port with some configurable delay
+ */
+class WebSocketServerApp[F[_]: Timer: ContextShift: Par: LiftIO](logger: Logger[F])(implicit F: ConcurrentEffect[F]) {
 
   case class Resources(config: ServerConfig, system: ActorSystem)
 
@@ -39,8 +38,7 @@ class WebSocketServerApp[F[_] : Timer : ContextShift : Par : LiftIO](logger: Log
     for {
       config <- F.delay(loadConfigOrThrow[ServerConfig]).resource
       system <- Resource.make(F.delay(system))(
-        s => LiftIO[F].liftIO(IO.fromFuture(IO(s.terminate()))).void
-      )
+        s => LiftIO[F].liftIO(IO.fromFuture(IO(s.terminate()))).void)
     } yield Resources(config, system)
 
   def launch(r: Resources): F[Unit] = {
@@ -60,8 +58,7 @@ class WebSocketServerApp[F[_] : Timer : ContextShift : Par : LiftIO](logger: Log
           logger.debug(line.utf8String)
           val ticker = iveMapper.map(line)
           TextMessage(ticker.asJson.toString())
-        }
-      )
+        })
 
       // define a websocket route for clients to connect to and start receiving the stream of ticker items
       route <- F.delay(path(r.config.route) {
@@ -81,18 +78,14 @@ class WebSocketServerApp[F[_] : Timer : ContextShift : Par : LiftIO](logger: Log
         .withWebsocketSettings(
           defaultSettings
             .websocketSettings
-            .withPeriodicKeepAliveData(() => ByteString(s"debug-${pingCounter.incrementAndGet()}"))
-        )
+            .withPeriodicKeepAliveData(() => ByteString(s"debug-${pingCounter.incrementAndGet()}")))
         .withSocketOptions(
-          List(Inet.SO.SendBufferSize(r.config.sendBufferSize))
-        )
+          List(Inet.SO.SendBufferSize(r.config.sendBufferSize)))
         .withTimeouts(
           defaultSettings
             .timeouts
             .withIdleTimeout(r.config.idleTimeoutS.seconds)
-            .withLingerTimeout(r.config.lingerTimeoutS.seconds)
-        ))
-
+            .withLingerTimeout(r.config.lingerTimeoutS.seconds)))
 
       // Bind the route to the webserver
       _ <- F.delay(Http()(r.system)
@@ -100,11 +93,11 @@ class WebSocketServerApp[F[_] : Timer : ContextShift : Par : LiftIO](logger: Log
           handler = route,
           interface = r.config.httpServer.interface,
           port = r.config.httpServer.port,
-          settings = customServerSettings
-        )
+          settings = customServerSettings)
         .onComplete {
           case Success(_) => logger.info(s"Server is up and running")
-          case Failure(e) => logger.error(s"Binding failed with ${e.getMessage}")
+          case Failure(e) =>
+            logger.error(s"Binding failed with ${e.getMessage}")
             r.system.terminate()
         })
     } yield ()

@@ -13,11 +13,11 @@ package object userService extends UserService.Service[UserService] {
     ZIO.accessM(_.userService getById id)
 
   override def buyStock(uid: UUID, stock: StockOp): ZIO[UserService, Throwable, UserAccount] =
-    ZIO.accessM(_.userService buyStock(uid, stock))
+    ZIO.accessM(_.userService buyStock (uid, stock))
 
   override def sellStock(uid: UUID, stock: StockOp): ZIO[UserService, Throwable, UserAccount] =
-    ZIO.accessM(_.userService sellStock(uid, stock))
+    ZIO.accessM(_.userService sellStock (uid, stock))
 
   override def addFund(uid: UUID, fund: CurrencyValue): ZIO[UserService, Throwable, UserAccount] =
-    ZIO.accessM(_.userService addFund(uid, fund))
+    ZIO.accessM(_.userService addFund (uid, fund))
 }

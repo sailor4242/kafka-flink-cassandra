@@ -7,8 +7,8 @@ import doobie._
 import doobie.implicits._
 import scalaz.zio.interop.catz._
 import scalaz.zio._
-import cats.implicits._
-import doobie.free.connection
+//import cats.implicits._
+//import doobie.free.connection
 import doobie.h2.implicits._
 
 trait Repository {
@@ -34,7 +34,6 @@ object Repository {
     def updateFundById(id: Long, fund: CurrencyValue): ZIO[R, Throwable, Unit]
 
   }
-
 
   trait Live extends Repository {
 
@@ -103,7 +102,6 @@ object Repository {
       def getByUID(uid: UUID): Query0[(Long, User)] = sql"""
           SELECT * FROM USERS WHERE UID = $uid
           """.query[(Long, User)]
-
 
       def getAllStocksByUserId(id: Long): Query0[Stock] = sql"""
           SELECT stock, price, currency, quantity, deal_time FROM USER_STOCKS WHERE USER_ID = $id

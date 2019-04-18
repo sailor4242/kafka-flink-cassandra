@@ -1,0 +1,61 @@
+version: '3'
+services:
+
+  websocket-server:
+    build: ./websocket-server/target/docker/stage
+    depends_on:
+      - kafka
+
+  websocket-client:
+    build: ./websocket-client-kafka/target/docker/stage
+    depends_on:
+      - kafka
+
+  flink-processor:
+    build: ./flink-processor/target/docker/stage
+    depends_on:
+      - kafka
+      - cassandra
+
+  user-rest-server:
+    build: ./user-rest-server/target/docker/stage
+    depends_on:
+      - cassandra
+    ports:
+        - "8081:8081"
+
+#  postgres:
+#    image: postgres:11
+#    ports:
+#    - "5432:5432"
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_DB: ...
+  kafka:
+    image: johnnypark/kafka-zookeeper
+    ports:
+      - "9092:9092"
+      - "2181:2181"
+    environment:
+      ADVERTISED_HOST: 127.0.0.1
+      ADVERTISED_PORT: 9092
+
+  cassandra:
+      image: cassandra
+      ports:
+        - "9042:9042"
+#      volumes:
+#              - ./out/cassandra_data:/var/lib/cassandra
+
+# https://stackoverflow.com/questions/30063907/using-docker-compose-how-to-execute-multiple-commands
+# https://medium.freecodecamp.org/docker-entrypoint-cmd-dockerfile-best-practices-abc591c30e21
+
+#  https://stackoverflow.com/questions/40443617/init-script-for-cassandra-with-docker-compose
+#  cassandra-load-keyspace:
+#        container_name: cassandra-load-keyspace
+#        image: cassandra:latest
+#        depends_on:
+#          - cassandra
+#        volumes:
+#          - ./src/main/resources/cassandra_schema.cql:/schema.cql
+#        command: /bin/bash -c "sleep 60 && echo loading cassandra keyspace && cqlsh cassandra -f /schema.cql"
