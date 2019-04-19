@@ -37,7 +37,7 @@ lazy val websocketServer = (project in file("websocket-server"))
     ) ++ commonDependencies ++ akka,
     mainClass in Compile := Some("App"),
     packageName in Docker := "websocket-server",
-    dockerBaseImage := "anapsix/alpine-java",
+    dockerBaseImage := "openjdk:8",
     dockerUpdateLatest := true
   )
   .enablePlugins(JavaAppPackaging)
@@ -51,7 +51,7 @@ lazy val websocketClientKafka = (project in file("websocket-client-kafka"))
     libraryDependencies ++= commonDependencies ++ akka,
     mainClass in Compile := Some("WebSocketClientToKafka"),
     packageName in Docker := "websocket-client",
-    dockerBaseImage := "anapsix/alpine-java",
+    dockerBaseImage := "openjdk:8",
     dockerUpdateLatest := true
   )
   .enablePlugins(JavaAppPackaging)
@@ -65,7 +65,7 @@ lazy val flinkProcessor = (project in file("flink-processor"))
     libraryDependencies ++= commonDependencies ++ flink,
     mainClass in Compile := Some("FlinkProcessTopic"),
     packageName in Docker := "flink-processor",
-    dockerBaseImage := "anapsix/alpine-java",
+    dockerBaseImage := "openjdk:8",
     dockerUpdateLatest := true
   )
   .enablePlugins(JavaAppPackaging)
@@ -79,7 +79,7 @@ lazy val userRestServer = (project in file("user-rest-server"))
     libraryDependencies ++= commonDependencies ++ akka ++ doobie ++ scalaz,
     mainClass in Compile := Some("UserRestServer"),
     packageName in Docker := "user-rest-server",
-    dockerBaseImage := "anapsix/alpine-java",
+    dockerBaseImage := "openjdk:8",
     dockerExposedPorts ++= Seq(8081),
     dockerUpdateLatest := true
   )

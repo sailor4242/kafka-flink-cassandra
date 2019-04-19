@@ -74,7 +74,7 @@ object FlinkProcessTopic extends App {
   CassandraSink.addSink(bar1MinStream)
     .setHost(config.cassandraConfig.host, config.cassandraConfig.port)
     .setQuery("INSERT INTO " +
-      "test_keyspace.table_ohlc1m(id, ticker, timeStart, open, high, low, close , volume, " +
+      "test_keyspace.table_ohlc1m(id, ticker, start_time, open, high, low, close_time, volume, " +
       "currency) " +
       "values (?, ?, ?, ?, ?, ?, ?, ?, ? );").build()
 
