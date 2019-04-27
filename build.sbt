@@ -57,6 +57,62 @@ lazy val websocketClientKafka = (project in file("websocket-client-kafka"))
   .enablePlugins(JavaAppPackaging)
   .enablePlugins(DockerPlugin)
 
+lazy val restCassandra = (project in file("rest-cassandra"))
+  .dependsOn(model)
+  .settings(
+    baseSettings,
+    addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
+    addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.7"),
+    addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.2.4"),
+    libraryDependencies ++= Seq(
+      "io.chrisdavenport" %% "log4cats-slf4j" % log4CatsVersion,
+      "io.chrisdavenport" %% "cats-par" % "0.2.0",
+      "io.monix" %% "monix" % "3.0.0-RC2",
+      "com.typesafe" % "config" % "1.3.2",
+      "com.typesafe.akka" %% "akka-http-spray-json" % "10.1.8",
+      "com.typesafe.akka" %% "akka-stream" % "2.5.12",
+      "com.typesafe.akka" %% "akka-http" % "10.1.8",
+      "com.typesafe.akka" %% "akka-http-core" % "10.1.8",
+      "io.getquill" %% "quill-cassandra-monix" % "3.1.0",
+      "de.heikoseeberger" %% "akka-http-circe" % "1.24.3",
+      "io.circe" %% "circe-core" % circeVersion,
+      "io.circe" %% "circe-derivation" % circeDerivationVersion,
+      "io.circe" %% "circe-generic" % circeVersion,
+      "io.circe" %% "circe-java8" % circeVersion,
+      "io.circe" %% "circe-parser" % circeVersion,
+      "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
+      "com.beachape" %% "enumeratum" % enumeratumVersion,
+      "com.beachape" %% "enumeratum-circe" % enumeratumVersion,
+      "com.github.pureconfig" %% "pureconfig" % pureConfigVersion,
+      "ch.qos.logback" % "logback-classic" % "1.2.3"
+    ),
+    mainClass in Compile := Some("App")
+  )
+
+lazy val sparkProcessor2 = (project in file("spark-processor2"))
+  .dependsOn(model)
+  .settings(
+    baseSettings,
+    libraryDependencies ++= Seq(
+      sparkCore/* % Provided*/,
+      sparkStreaming/* % Provided*/,
+      sparkSql/* % Provided*/,
+      kafkaStreaming,
+      kafkaSql,
+      typeSafeConfig,
+      "com.datastax.cassandra"          % "cassandra-driver-core"         % "3.6.0",
+      "com.datastax.spark" %% "spark-cassandra-connector" % "2.4.1",
+      cats,
+      logging,
+      scalaTest % Test,
+      scalaCheck % Test,
+      catsLaws % Test,
+      catsTests % Test,
+      sparkTests % Test,
+      "com.github.pureconfig" %% "pureconfig" % pureConfigVersion
+    )
+  )
+
 lazy val flinkProcessor = (project in file("flink-processor"))
   .dependsOn(model)
   .settings(
