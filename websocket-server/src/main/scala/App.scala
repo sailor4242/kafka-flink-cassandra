@@ -13,7 +13,6 @@ import akka.stream.scaladsl.Sink
 
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
-import cats.implicits._
 
 object App extends IOApp {
 
