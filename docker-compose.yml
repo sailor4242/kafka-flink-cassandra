@@ -24,6 +24,20 @@ services:
     ports:
       - "8081:8081"
 
+  rest-cassandra:
+    build: ./rest-cassandra/target/docker/stage
+    depends_on:
+      - cassandra
+    ports:
+      - "8077:8077"
+
+  spark-processor2:
+    build: ./spark-processor2/target/docker/stage
+    depends_on:
+      - kafka
+      - cassandra
+
+
 #  postgres:
 #    image: postgres:11
 #    ports:
@@ -59,6 +73,7 @@ services:
     volumes:
       - ./flink-processor/src/main/resources/cassandra_schema.cql:/cassandra_schema.cql
     command: /bin/bash -c "sleep 20 && echo loading cassandra keyspace && cqlsh cassandra -f /cassandra_schema.cql"
+
 #    deploy:
 #      restart_policy:
 #        condition: on-failure
