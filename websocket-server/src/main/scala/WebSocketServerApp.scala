@@ -11,6 +11,7 @@ import akka.stream.{ ActorMaterializer, ActorMaterializerSettings }
 import akka.stream.scaladsl.{ FileIO, Framing, Sink }
 import akka.util.ByteString
 import cats.effect._
+import cats.implicits._
 import syntax._
 import cats.temp.par.Par
 import pureconfig.loadConfigOrThrow
@@ -20,7 +21,6 @@ import io.circe.generic.auto._
 import io.circe.syntax._
 import pureconfig.generic.auto._
 import io.chrisdavenport.log4cats.Logger
-import cats.implicits._
 
 /**
  * Websocket server that reads csv file of stock ticks

@@ -61,9 +61,9 @@ object App extends IOApp {
     blocking.use { blockingCS =>
       for {
         cfg <- ServerConfig.read
-        /*implicit0*/(sys: ActorSystem) <- system
+        implicit0(sys: ActorSystem) <- system
         source <- DataSource.getDataSource(cfg, ETFTickerMapper.apply, blockingCS)
-        _ <- runServerAndSystem(route(cfg, source), cfg)(sys)
+        _ <- runServerAndSystem(route(cfg, source), cfg)
         _ <- IO.never
       } yield ExitCode.Success
     }
