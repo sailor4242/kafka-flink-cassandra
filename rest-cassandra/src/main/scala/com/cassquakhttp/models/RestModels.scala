@@ -1,6 +1,6 @@
 package com.cassquakhttp.models
 
-import com.cassquakhttp.dbconnectors.CassandraDBConn
+import com.cassquakhttp.db.connections.CassandraDBConn
 
 final case class MarketData(
                              barTime: String,
@@ -14,8 +14,12 @@ final case class MarketData(
                            )
 object MarketData extends CassandraDBConn {
   import dbStream._
-  val getAllByTicker = quote{ticker: String => query[MarketData].filter(_.ticker == ticker) }
+  val getAllByTicker = quote{tickerQuery: String => query[MarketData].filter(t => t.ticker ==  tickerQuery) }
+  val getElFilterByVolume = quote{vol: Int => query[MarketData].filter(_.volume > vol) }
+
   val getAll = quote(query[MarketData])
-  def getElementsByTicker = dbStream.run(getAllByTicker(lift("FXUS")))
+
+
+
   def getAllElements = dbStream.run(getAll)
 }

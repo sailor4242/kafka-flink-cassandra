@@ -1,4 +1,4 @@
-#### spark 2.4+ under Windows 10 OS 
+#### Apache Spark 2.4+ under Windows 10 OS 
 - first of all you need to download C:\Hadoop\bin\winutils to cheat / hack / simulate presents of 
 hdfs under your dummy Win operation system ( google how to do this )
 

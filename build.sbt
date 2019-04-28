@@ -7,6 +7,11 @@ name := "kafka-flink-cassandra"
 
 version := "0.0.1-SANPSHOT"
 
+val runtimeLibrarySettings = Seq(
+  crossScalaVersions := Seq("2.11.12", "2.12.7"),
+  scalaVersion := crossScalaVersions.value.head
+)
+
 lazy val root = (
   project.in(file("."))
     aggregate(websocketServer, websocketClientKafka, flinkProcessor, userRestServer,
@@ -30,7 +35,6 @@ lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.0.4"
 lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.13.4"
 
 lazy val sparkVersion = "2.4.1"
-// lazy val catsVersion = "1.0.1"
 lazy val sparkCore = "org.apache.spark" %% "spark-core" % sparkVersion
 lazy val sparkStreaming = "org.apache.spark" %% "spark-streaming" % sparkVersion
 lazy val kafkaStreaming = "org.apache.spark" %% "spark-streaming-kafka-0-10" % sparkVersion
@@ -51,7 +55,7 @@ lazy val websocketServer = (project in file("websocket-server"))
   .dependsOn(model)
   .settings(
      baseSettings,
-    //baseSettingsScala211,
+    //runtimeLibrarySettings,
     compilerPlugins,
     libraryDependencies ++= Seq(
       "io.chrisdavenport" %% "log4cats-core" % log4CatsVersion,
@@ -71,7 +75,7 @@ lazy val websocketClientKafka = (project in file("websocket-client-kafka"))
   .dependsOn(model)
   .settings(
      baseSettings,
-    //baseSettingsScala211,
+    //runtimeLibrarySettings,
     compilerPlugins,
     libraryDependencies ++= commonDependencies ++ akka,
     mainClass in Compile := Some("WebSocketClientToKafka"),
@@ -83,15 +87,14 @@ lazy val websocketClientKafka = (project in file("websocket-client-kafka"))
   .enablePlugins(DockerPlugin)
 
 lazy val restCassandra = (project in file("rest-cassandra"))
-  //.dependsOn(model)
   .settings(
      baseSettings,
-    //baseSettingsScala211,
-    addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
-    addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.7"),
-    addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.2.4"),
+    addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M11" cross CrossVersion.patch),
+    addCompilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.0-M4"),
+    addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.0"), 
     libraryDependencies ++= Seq(
       "io.chrisdavenport" %% "log4cats-slf4j" % log4CatsVersion,
+      "com.github.mpilquist" %% "simulacrum" % "0.16.0",
       "io.chrisdavenport" %% "cats-par" % "0.2.0",
       "io.monix" %% "monix" % "3.0.0-RC2",
       "com.typesafe" % "config" % "1.3.2",
@@ -116,15 +119,19 @@ lazy val restCassandra = (project in file("rest-cassandra"))
     packageName in Docker := "rest-cassandra",
     dockerExposedPorts ++= Seq(8077),
     dockerBaseImage := "openjdk:8",
-    dockerUpdateLatest := true
+    dockerUpdateLatest := true ,
+   
   )
   .enablePlugins(JavaAppPackaging)
   .enablePlugins(DockerPlugin)
 
+lazy val scala211 = "2.11.11"
+lazy val scala212 =  "2.12.7"
+
 lazy val sparkProcessor2 = (project in file("spark-processor2"))
-  //.dependsOn(model)
   .settings(
-    baseSettingsScala211,
+  runtimeLibrarySettings,
+    baseSettings,
     libraryDependencies ++= Seq(
       sparkCore/* % Provided*/,
       sparkStreaming/* % Provided*/,
@@ -155,7 +162,7 @@ lazy val flinkProcessor = (project in file("flink-processor"))
   .dependsOn(model)
   .settings(
      baseSettings,
-   // baseSettingsScala211,
+    //runtimeLibrarySettings,
     compilerPlugins,
     libraryDependencies ++= commonDependencies ++ flink,
     mainClass in Compile := Some("FlinkProcessTopic"),
@@ -170,7 +177,7 @@ lazy val userRestServer = (project in file("user-rest-server"))
   .dependsOn(model)
   .settings(
      baseSettings,
-  //baseSettingsScala211,
+    //runtimeLibrarySettings,
     compilerPlugins,
     libraryDependencies ++= commonDependencies ++ akka ++ doobie ++ scalaz,
     mainClass in Compile := Some("UserRestServer"),
@@ -185,7 +192,6 @@ lazy val userRestServer = (project in file("user-rest-server"))
 lazy val model = (project in file("model"))
   .settings(
      baseSettings,
-   // baseSettingsScala211,
     libraryDependencies ++= circe,
     libraryDependencies ++= Seq(
       "com.beachape" %% "enumeratum" % enumeratumVersion,
@@ -254,21 +260,6 @@ lazy val baseSettings = Seq(
   cancelable in Global := true
 )
 
-lazy val baseSettingsScala211 = Seq(
-  scalaVersion in ThisBuild := "2.11.12",
-  resolvers ++= Seq(
-    Resolver.sonatypeRepo("releases"),
-    Resolver.sonatypeRepo("snapshots"),
-    Resolver.bintrayRepo("ovotech", "maven")
-  ),
-  scalacOptions ++= commonScalacOptions,
-  scalacOptions ++= Seq("-Xmax-classfile-name", "256"),
-  // parallelExecution in Test := false,
-  parallelExecution in Test := true,
-  sources in(Compile, doc) := Nil,
-  publishTo := None,
-  cancelable in Global := true
-)
 
 lazy val compilerPlugins = Seq(
   addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9"),
