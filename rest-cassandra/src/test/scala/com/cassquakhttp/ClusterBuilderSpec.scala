@@ -40,4 +40,5 @@ class ClusterBuilderSpec
       clusterBuilder.getContactPoints must contain theSameElementsAs (contactPoints)
     }
   }
-}*/
+}
+*/
