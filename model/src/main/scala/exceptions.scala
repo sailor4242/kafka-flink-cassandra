@@ -6,4 +6,6 @@ package exceptions {
 
   final case class UserNotFound(uid: UUID) extends StacklessException(s"User $uid not found")
 
+  final case class DataFileNotFound(path: String) extends StacklessException(s"Data file by $path not found")
+
 }
