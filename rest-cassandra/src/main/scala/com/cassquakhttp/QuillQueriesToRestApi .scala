@@ -11,17 +11,17 @@ import com.cassquakhttp.dbconnectors.CassandraDBConn
 import com.cassquakhttp.models.MarketData
 import spray.json._
 
-// todo вынести это в папучку protocols
+
 trait Protocols extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val TableOhlc30sFormat = jsonFormat8(MarketData.apply)
 }
 
 import scala.concurrent.duration._
 
-// todo поменять на HttpApp потом
+
 object QuillSimpleQueries2 extends App with Protocols with CassandraDBConn {
   println("Starting")
-  // todo куда засунуть имплициды эти посмотри на микросервисы Олега
+
   implicit val system = ActorSystem("my-system")
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher

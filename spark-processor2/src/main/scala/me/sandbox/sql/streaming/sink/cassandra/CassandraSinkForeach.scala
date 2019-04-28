@@ -24,7 +24,7 @@ case class CassandraSinkForeach(sparkSession : SparkSession,
       session.execute( writer.putQuery(record,nameSpace, tableName ))
     }
     () // suppress Error:(23, 28) discarded non-Unit value
-  } // todo find annotation
+  }
   def close(errorOrNull: Throwable): Unit = {  /* close the connection */ }
 }
 
@@ -51,7 +51,5 @@ class CassandraSinkForeachDataStax(servers: Set[String],
       () // Suppress “discarded non-Unit value” warning
     }
   }
-  // todo what is the question below
-  /* how we can close it manually ? */
   override def close(errorOrNull: Throwable): Unit = {}
 }

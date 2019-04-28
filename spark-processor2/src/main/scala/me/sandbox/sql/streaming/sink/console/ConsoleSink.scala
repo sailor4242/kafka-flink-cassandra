@@ -7,7 +7,6 @@ import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery, Trigger}
 class ConsoleSink(trigger: Trigger = Trigger.Once(),
                   outputMode: OutputMode = OutputMode.Update())
   extends StreamingSink {
-// todo this file didn't connect to actual kafka to console stream
   override def writeStream(data: DataFrame): StreamingQuery = {
     data.writeStream
       .format("console")

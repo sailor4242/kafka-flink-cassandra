@@ -19,7 +19,6 @@ object TickStructType {
       StructField("time", StringType, nullable = false),
       StructField("last", StructType  {
         Seq(
-          // todo Tried to put DecimalType(6,6) but gives [null,null,null,null] || wtf ?
           StructField("value", DoubleType, nullable = false) ,
           StructField("currency", StringType, nullable = false)
         )

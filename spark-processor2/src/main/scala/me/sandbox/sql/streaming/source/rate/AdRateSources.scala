@@ -7,7 +7,6 @@ class AdRateSources(val spark: SparkSession,
                     val rowsPerSecond: String = "5",
                     val numPartitions: String = "1") extends RateSource {
 
-// todo probably it shoould be moved to source microservice
   def loadImpressions(): DataFrame = {
     readStream()
       .select(
@@ -15,10 +14,11 @@ class AdRateSources(val spark: SparkSession,
         col("timestamp").as("impressionTime"))
   }
 
-  def loadClicks(): DataFrame = {
+  def loadData(): DataFrame = {
     readStream()
       .where((rand() * 100).cast("integer") < 10) // 10 out of every 100 impressions result in a click
-      .select((col("value") - 50).as("adId"), col("timestamp").as("clickTime")) // -50 so that a click with same id as impression is generated much later (i.e. delayed data).
+      .select((col("value") - 50).as("adId"), col("timestamp").as("time")) // -50 so that a click
+      // with same id as impression is generated much later (i.e. delayed data).
       .where("adId > 0")
   }
 
