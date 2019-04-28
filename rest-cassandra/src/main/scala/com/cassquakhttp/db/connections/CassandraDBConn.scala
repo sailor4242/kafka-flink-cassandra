@@ -1,4 +1,4 @@
-package com.cassquakhttp.dbconnectors
+package com.cassquakhttp.db.connections
 
 import io.getquill.{CassandraAsyncContext, CassandraStreamContext, SnakeCase}
 import monix.execution.Scheduler
