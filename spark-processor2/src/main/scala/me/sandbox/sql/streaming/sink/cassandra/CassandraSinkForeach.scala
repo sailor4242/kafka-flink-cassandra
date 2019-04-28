@@ -20,9 +20,11 @@ case class CassandraSinkForeach(sparkSession : SparkSession,
 
   def process(record: Row): Unit = {
     println(s"Process new $record")
-    connector.withSessionDo(session =>
-      session.execute( writer.putQuery(record,nameSpace, tableName )  )  )
-  }
+    connector.withSessionDo{session =>
+      session.execute( writer.putQuery(record,nameSpace, tableName ))
+    }
+    () // suppress Error:(23, 28) discarded non-Unit value
+  } // todo find annotation
   def close(errorOrNull: Throwable): Unit = {  /* close the connection */ }
 }
 

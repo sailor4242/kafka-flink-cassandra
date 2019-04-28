@@ -13,7 +13,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
   */
 object KafkaToSparkModels {
 
-  class KafkaToSpark(sparkSession: SparkSession) extends StreamingSource {
+  case class KafkaToSpark(sparkSession: SparkSession) extends StreamingSource {
 
     import sparkSession.implicits._
 

@@ -34,7 +34,7 @@ object QuillSimpleQueries2 extends App with Protocols with CassandraDBConn {
   val streamSource = Source.fromPublisher(MarketData.getAllElements.toReactivePublisher)
 
   def route =
-    path("hi") {
+    path("data") {
       get {
         complete(streamSource.via(getThrottlingFlow[MarketData]))
       }
