@@ -5,7 +5,7 @@ trait TickerMapper {
   def map(line: ByteString): Ticker
 }
 
-class IveTickerMapper extends TickerMapper {
+class ETFTickerMapper extends TickerMapper {
 
   val inputDateTimeFormat = new java.text.SimpleDateFormat("yyyyMMddhhmmss")
   val outputDateTimeFormat = new java.text.SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
@@ -18,4 +18,8 @@ class IveTickerMapper extends TickerMapper {
       CurrencyValue(BigDecimal(str(3)), Currency.RUB),
       str(4).toInt)
   }
+}
+
+object ETFTickerMapper {
+  def apply: ETFTickerMapper = new ETFTickerMapper()
 }

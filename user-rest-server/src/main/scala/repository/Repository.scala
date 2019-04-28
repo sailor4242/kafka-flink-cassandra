@@ -5,6 +5,8 @@ import java.util.UUID
 import model._
 import doobie._
 import doobie.implicits._
+//import exceptions.UserNotFound
+//import scalaz.OptionT
 import scalaz.zio.interop.catz._
 import scalaz.zio._
 //import cats.implicits._
@@ -29,9 +31,9 @@ object Repository {
 
     def updateUser(user: User): ZIO[R, Throwable, User]
 
-    def updateStockById(id: Long, stock: Stock): ZIO[R, Throwable, Unit]
+    def updateStockByUserUid(uid: UUID, stock: Stock): ZIO[R, Throwable, Unit]
 
-    def updateFundById(id: Long, fund: CurrencyValue): ZIO[R, Throwable, Unit]
+    def updateFundByUserUid(uid: UUID, fund: CurrencyValue): ZIO[R, Throwable, Unit]
 
   }
 
@@ -84,32 +86,53 @@ object Repository {
 
       override def updateUser(user: User): ZIO[Any, Throwable, User] = ???
 
-      override def updateStockById(id: FiberId, stock: Stock): ZIO[Any, Throwable, Unit] = ???
 
-      override def updateFundById(id: FiberId, fund: CurrencyValue): ZIO[Any, Throwable, Unit] = ???
-    }
+      override def updateStockByUserUid(uid: UUID, stock: Stock): ZIO[Any, Throwable, Unit] = ???
 
-    object DB {
+//      override def updateFundByUserUid(uid: UUID, fund: CurrencyValue): Task[Unit] = {
+//        val update = for {
+//          userWithId <- OptionT(DB.getByUID(uid).option) //.toRight(UserNotFound(uid))
+//          up <- OptionT(DB.getFundByUserIdAndCurrency(userWithId._1, fund.currency).option)
+//            .map(fundWithId => CurrencyValue(fundWithId._2.value + fund.value, fundWithId._2.currency))
+//            .fold(newFund => DB.updateFundByIdAndCurrency(userWithId._1, newFund), DB.updateFundByIdAndCurrency(userWithId._1, fund))
+//        } yield up
+//        update.run.transact(transactor).void
+//      }
 
-      implicit val currencyMeta: Meta[Currency] = Meta[String].timap(Currency.withName)(_.toString)
-      implicit val tickerTypeMeta: Meta[TickerType] = Meta[String].timap(TickerType.withName)(_.toString)
+      object DB {
 
-      def save(user: User): Update0 = sql"""
+        implicit val currencyMeta: Meta[Currency] = Meta[String].timap(Currency.withName)(_.toString)
+        implicit val tickerTypeMeta: Meta[TickerType] = Meta[String].timap(TickerType.withName)(_.toString)
+
+        def save(user: User): Update0 =
+          sql"""
           INSERT INTO USERS (UID, FIRST_NAME, LAST_NAME)
           VALUES (${user.uid}, ${user.firstName}, ${user.lastName})
           """.update
 
-      def getByUID(uid: UUID): Query0[(Long, User)] = sql"""
+        def getByUID(uid: UUID): Query0[(Long, User)] = sql"""
           SELECT * FROM USERS WHERE UID = $uid
           """.query[(Long, User)]
 
-      def getAllStocksByUserId(id: Long): Query0[Stock] = sql"""
+        def getAllStocksByUserId(id: Long): Query0[Stock] = sql"""
           SELECT stock, price, currency, quantity, deal_time FROM USER_STOCKS WHERE USER_ID = $id
           """.query[Stock]
 
-      def getAllFundsByUserId(id: Long): Query0[CurrencyValue] = sql"""
+        def getAllFundsByUserId(id: Long): Query0[CurrencyValue] = sql"""
             SELECT value, currency FROM USER_FUNDS WHERE USER_ID = $id
             """.query[CurrencyValue]
+
+        def getFundByUserIdAndCurrency(id: Long, currency: Currency): Query0[(Long, CurrencyValue)] = sql"""
+            SELECT id, value, currency FROM USER_FUNDS WHERE USER_ID = $id
+            AND currency = $currency FOR UPDATE
+            """.query[(Long, CurrencyValue)]
+
+        def updateFundByIdAndCurrency(userId: Long, cv: CurrencyValue): Query0[CurrencyValue] = sql"""
+            MERGE INTO currency (userId, value, currency) key (userId)
+            values ($userId, ${cv.value}, ${cv.currency})
+            """.query[CurrencyValue]
+      }
+
     }
 
   }

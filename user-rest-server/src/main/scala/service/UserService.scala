@@ -49,7 +49,10 @@ object UserService {
 
       override def sellStock(uid: UUID, stock: StockOp): ZIO[Any, Throwable, UserAccount] = ???
 
-      override def addFund(uid: UUID, fund: CurrencyValue): ZIO[Any, Throwable, UserAccount] = ???
+      override def addFund(uid: UUID, fund: CurrencyValue): ZIO[Any, Throwable, UserAccount] = for {
+        _ <- repository.updateFundByUserUid(uid, fund)
+        user <- getById(uid)
+      } yield user
     }
   }
 

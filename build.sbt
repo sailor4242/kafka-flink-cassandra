@@ -13,7 +13,8 @@ lazy val root = (
 
 lazy val metaParadiseVersion = "3.0.0-M11"
 lazy val catsMTLVersion = "0.4.0"
-lazy val catsVersion = "1.4.0"
+lazy val catsVersion = "1.6.0"
+lazy val catsEffectVersion = "1.2.0"
 lazy val log4CatsVersion = "0.2.0"
 lazy val circeDerivationVersion = "0.11.0-M1"
 lazy val circeVersion = "0.11.1"
@@ -29,12 +30,7 @@ lazy val websocketServer = (project in file("websocket-server"))
   .settings(
     baseSettings,
     compilerPlugins,
-    libraryDependencies ++= Seq(
-      "io.chrisdavenport" %% "log4cats-core" % log4CatsVersion,
-      "io.chrisdavenport" %% "log4cats-slf4j" % log4CatsVersion,
-      "io.chrisdavenport" %% "cats-par" % "0.2.0",
-      "io.monix" %% "monix" % "3.0.0-RC2"
-    ) ++ commonDependencies ++ akka,
+    libraryDependencies ++= cats ++ commonDependencies ++ akka,
     mainClass in Compile := Some("App"),
     packageName in Docker := "websocket-server",
     dockerBaseImage := "openjdk:8",
@@ -49,7 +45,7 @@ lazy val websocketClientKafka = (project in file("websocket-client-kafka"))
     baseSettings,
     compilerPlugins,
     libraryDependencies ++= commonDependencies ++ akka,
-    mainClass in Compile := Some("WebSocketClientToKafka"),
+    mainClass in Compile := Some("App"),
     packageName in Docker := "websocket-client",
     dockerBaseImage := "openjdk:8",
     dockerUpdateLatest := true
@@ -129,6 +125,11 @@ lazy val akka = Seq(
   "de.heikoseeberger" %% "akka-http-circe" % "1.25.2"
 )
 
+lazy val cats = Seq(
+  "org.typelevel" %% "cats-core"   % catsVersion,
+  "org.typelevel" %% "cats-effect" % catsEffectVersion
+)
+
 lazy val scalaz = Seq(
   "org.scalaz" %% "scalaz-core" % ScalaZVersion,
   "org.scalaz" %% "scalaz-zio" % ZIOVersion,
@@ -158,8 +159,8 @@ lazy val baseSettings = Seq(
 )
 
 lazy val compilerPlugins = Seq(
-  addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9"),
-  addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.2.4")
+  addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.0"),
+  addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.0-M4")
 )
 
 lazy val commonScalacOptions = Seq(
@@ -175,7 +176,6 @@ lazy val commonScalacOptions = Seq(
   "-Xfatal-warnings",
   "-Xlint",
   "-Yno-adapted-args",
-  "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard",
   "-Xfuture",
